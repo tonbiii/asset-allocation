@@ -1,0 +1,7 @@
+numpy
+pandas
+tqdm
+scikit-learn==1.3.0
+torch
+flask
+requests
