@@ -24,7 +24,7 @@ from typing import Dict, Literal, Union
 import bittensor as bt
 import numpy as np
 import web3.constants
-from pydantic import BaseModel, Field, PrivateAttr, validator
+from pydantic import BaseModel, Field, PrivateAttr, model_validator
 from web3 import Web3
 from web3.contract import Contract
 
@@ -58,17 +58,22 @@ class BasePoolModel(BaseModel):
     borrow_amount: int = Field(..., description="borrow amount in wei")
     reserve_size: int = Field(..., description="pool reserve size in wei")
 
-    @validator('pool_id')
-    def check_pool_id(cls, value, info):
-        if len(value) <= 0:
+    @model_validator(mode='before')
+    @classmethod
+    def check_pool_id(cls, values):
+        pool_id = values.get('pool_id')
+        if pool_id is None or len(pool_id) <= 0:
             raise ValueError("pool id is empty")
-        return value
+        return values
 
-    @validator('base_rate', 'base_slope', 'kink_slope', 'optimal_util_rate', 'borrow_amount', 'reserve_size')
-    def check_non_negative(cls, value, info):
-        if value < 0:
-            raise ValueError(f"{info.field_name.replace('_', ' ')} is negative")
-        return value
+    @model_validator(mode='before')
+    @classmethod
+    def check_non_negative(cls, values):
+        fields_to_check = ['base_rate', 'base_slope', 'kink_slope', 'optimal_util_rate', 'borrow_amount', 'reserve_size']
+        for field in fields_to_check:
+            if values.get(field, 0) < 0:
+                raise ValueError(f"{field.replace('_', ' ')} is negative")
+        return values
 
 
 class BasePool(BasePoolModel):
