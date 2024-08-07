@@ -25,8 +25,9 @@ import bittensor as bt
 import numpy as np
 import web3.constants
 from pydantic import BaseModel, Field, PrivateAttr, model_validator
-from web3 import Web3
+from web3 import Web3 
 from web3.contract import Contract
+from web3.types import ChecksumAddress
 
 from constants import *
 from ethmath import wei_div, wei_mul
@@ -159,6 +160,14 @@ class ChainBasedPoolModel(BaseModel):
 
     def supply_rate(self, **args):
         raise NotImplementedError("supply_rate() has not been implemented!")
+    user_address: ChecksumAddress = Field(
+        default=web3.constants.ADDRESS_ZERO, 
+        description="address of the 'user' - used for various on-chain calls",
+    )
+    contract_address: ChecksumAddress = Field(
+        default=web3.constants.ADDRESS_ZERO, 
+        description="address of contract to call"
+    )
 
 
 class PoolFactory:
