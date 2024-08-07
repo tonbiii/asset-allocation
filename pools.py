@@ -128,26 +128,27 @@ class ChainBasedPoolModel(BaseModel):
 
     pool_model_disc: Literal['CHAIN'] = Field(default='CHAIN', description="pool type discriminator")
     pool_id: str = Field(..., description="uid of pool")
-    pool_type: POOL_TYPES = Field(..., description="type of pool")
+    pool_type: str = Field(..., description="type of pool")
     user_address: str = Field(
-        default=web3.constants.ADDRESS_ZERO,
+        default=Web3.toChecksumAddress("0x0000000000000000000000000000000000000000"),
         description="address of the 'user' - used for various on-chain calls",
     )
     contract_address: str = Field(
-        default=web3.constants.ADDRESS_ZERO, description="address of contract to call"
+        default=Web3.toChecksumAddress("0x0000000000000000000000000000000000000000"),
+        description="address of contract to call"
     )
 
     _initted: bool = PrivateAttr(False)
 
-    @root_validator
+    @model_validator(mode='before')
+    @classmethod
     def check_params(cls, values):
-        if len(values.get("pool_id")) <= 0:
+        if len(values.get("pool_id", "")) <= 0:
             raise ValueError("pool id is empty")
-        if not Web3.is_address(values.get("contract_address")):
+        if not Web3.isAddress(values.get("contract_address", "")):
             raise ValueError("pool address is invalid!")
-        if not Web3.is_address(values.get("user_address")):
+        if not Web3.isAddress(values.get("user_address", "")):
             raise ValueError("user address is invalid!")
-
         return values
 
     def pool_init(self, **args):
