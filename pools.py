@@ -59,7 +59,7 @@ class BasePoolModel(BaseModel):
     borrow_amount: int = Field(..., description="borrow amount in wei")
     reserve_size: int = Field(..., description="pool reserve size in wei")
 
-    @root_validator
+    @model_validator(mode='before')
     def check_params(cls, values):
         if len(values.get("pool_id")) <= 0:
             raise ValueError("pool id is empty")
