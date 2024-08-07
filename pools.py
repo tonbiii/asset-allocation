@@ -24,7 +24,7 @@ from typing import Dict, Literal, Union
 import bittensor as bt
 import numpy as np
 import web3.constants
-from pydantic import BaseModel, Field, PrivateAttr, root_validator
+from pydantic import BaseModel, Field, PrivateAttr, validator
 from web3 import Web3
 from web3.contract import Contract
 
