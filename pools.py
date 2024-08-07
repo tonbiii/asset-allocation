@@ -59,23 +59,13 @@ class BasePoolModel(BaseModel):
     borrow_amount: int = Field(..., description="borrow amount in wei")
     reserve_size: int = Field(..., description="pool reserve size in wei")
 
-    @model_validator(mode='before')
-    def check_params(cls, values):
-        if len(values.get("pool_id")) <= 0:
+    @field_validator('pool_id', 'base_rate', 'base_slope', 'kink_slope', 'optimal_util_rate', 'borrow_amount', 'reserve_size', mode='before')
+    def check_params(cls, value, field):
+        if field.name == 'pool_id' and len(value) <= 0:
             raise ValueError("pool id is empty")
-        if values.get("base_rate") < 0:
-            raise ValueError("base rate is negative")
-        if values.get("base_slope") < 0:
-            raise ValueError("base slope is negative")
-        if values.get("kink_slope") < 0:
-            raise ValueError("kink slope is negative")
-        if values.get("optimal_util_rate") < 0:
-            raise ValueError("optimal utilization rate is negative")
-        if values.get("borrow_amount") < 0:
-            raise ValueError("borrow amount is negative")
-        if values.get("reserve_size") < 0:
-            raise ValueError("reserve size is negative")
-        return values
+        if field.name in ['base_rate', 'base_slope', 'kink_slope', 'optimal_util_rate', 'borrow_amount', 'reserve_size'] and value < 0:
+            raise ValueError(f"{field.name.replace('_', ' ')} is negative")
+        return value
 
 
 class BasePool(BasePoolModel):
