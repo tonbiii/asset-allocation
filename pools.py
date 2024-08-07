@@ -50,25 +50,24 @@ class BasePoolModel(BaseModel):
     """This model will primarily be used for synthetic requests"""
 
     pool_model_disc: Literal['SYNTHETIC'] = Field(default='SYNTHETIC', description="pool model discriminator")
-    pool_id: str = Field(..., description="uid of pool")
-    pool_type: POOL_TYPES = Field(default=POOL_TYPES.SYNTHETIC, description="type of pool")
-    base_rate: int = Field(..., description="base interest rate")
-    base_slope: int = Field(..., description="base interest rate slope")
-    kink_slope: int = Field(..., description="kink slope")
-    optimal_util_rate: int = Field(..., description="optimal utilisation rate")
+    pool_id: str = Field(..., description="pool id")
+    base_rate: float = Field(..., description="base rate")
+    base_slope: float = Field(..., description="base slope")
+    kink_slope: float = Field(..., description="kink slope")
+    optimal_util_rate: float = Field(..., description="optimal utilization rate")
     borrow_amount: int = Field(..., description="borrow amount in wei")
     reserve_size: int = Field(..., description="pool reserve size in wei")
 
     @validator('pool_id')
-    def check_pool_id(cls, value):
+    def check_pool_id(cls, value, info):
         if len(value) <= 0:
             raise ValueError("pool id is empty")
         return value
 
     @validator('base_rate', 'base_slope', 'kink_slope', 'optimal_util_rate', 'borrow_amount', 'reserve_size')
-    def check_non_negative(cls, value, field):
+    def check_non_negative(cls, value, info):
         if value < 0:
-            raise ValueError(f"{field.name.replace('_', ' ')} is negative")
+            raise ValueError(f"{info.field_name.replace('_', ' ')} is negative")
         return value
 
 
