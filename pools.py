@@ -49,11 +49,9 @@ class POOL_TYPES(str, Enum):
 class BasePoolModel(BaseModel):
     """This model will primarily be used for synthetic requests"""
 
-    pool_model_disc: Literal['SYNTHETIC'] = Field(default='SYNTHETIC', description="pool type discriminator")
+    pool_model_disc: Literal['SYNTHETIC'] = Field(default='SYNTHETIC', description="pool model discriminator")
     pool_id: str = Field(..., description="uid of pool")
-    pool_type: POOL_TYPES = Field(
-        default=POOL_TYPES.SYNTHETIC, const=True, description="type of pool"
-    )
+    pool_type: POOL_TYPES = Field(default=POOL_TYPES.SYNTHETIC, description="type of pool")
     base_rate: int = Field(..., description="base interest rate")
     base_slope: int = Field(..., description="base interest rate slope")
     kink_slope: int = Field(..., description="kink slope")
