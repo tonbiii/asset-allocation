@@ -47,16 +47,17 @@ class POOL_TYPES(str, Enum):
 
 
 class BasePoolModel(BaseModel):
-    """This model will primarily be used for synthetic requests"""
-
     pool_model_disc: Literal['SYNTHETIC'] = Field(default='SYNTHETIC', description="pool model discriminator")
     pool_id: str = Field(..., description="pool id")
+    pool_type: POOL_TYPES = Field(..., description="type of pool")
     base_rate: float = Field(..., description="base rate")
     base_slope: float = Field(..., description="base slope")
     kink_slope: float = Field(..., description="kink slope")
     optimal_util_rate: float = Field(..., description="optimal utilization rate")
     borrow_amount: int = Field(..., description="borrow amount in wei")
-    reserve_size: float = Field(..., description="pool reserve size in wei")
+    reserve_size: int = Field(..., description="pool reserve size in wei")
+    
+
 
     @model_validator(mode='before')
     @classmethod
