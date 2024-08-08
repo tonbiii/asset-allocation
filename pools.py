@@ -56,7 +56,7 @@ class BasePoolModel(BaseModel):
     kink_slope: float = Field(..., description="kink slope")
     optimal_util_rate: float = Field(..., description="optimal utilization rate")
     borrow_amount: int = Field(..., description="borrow amount in wei")
-    reserve_size: int = Field(..., description="pool reserve size in wei")
+    reserve_size: float = Field(..., description="pool reserve size in wei")
 
     @model_validator(mode='before')
     @classmethod
