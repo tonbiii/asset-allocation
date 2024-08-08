@@ -424,9 +424,10 @@ class AaveV3DefaultInterestRatePool(ChainBasedPoolModel):
 
 
 class VariableInterestSturdySiloStrategy(ChainBasedPoolModel):
+    """This class defines the default pool type for Sturdy Silo"""
 
-    pool_type: POOL_TYPES = Field(
-        POOL_TYPES.STURDY_SILO, const=True, description="type of pool"
+    pool_type: Literal['STURDY_SILO'] = Field(
+        default='STURDY_SILO', description="type of pool"
     )
 
     _silo_strategy_contract: Contract = PrivateAttr()
