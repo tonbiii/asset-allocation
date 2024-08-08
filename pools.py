@@ -188,8 +188,8 @@ class PoolFactory:
 class AaveV3DefaultInterestRatePool(ChainBasedPoolModel):
     """This class defines the default pool type for Aave"""
 
-    pool_type: POOL_TYPES = Field(
-        default=POOL_TYPES.AAVE, const=True, description="type of pool"
+    pool_type: Literal['AAVE'] = Field(
+        default='AAVE', description="type of pool"
     )
 
     _atoken_contract: Contract = PrivateAttr()
