@@ -56,8 +56,17 @@ class BasePoolModel(BaseModel):
     optimal_util_rate: float = Field(..., description="optimal utilization rate")
     borrow_amount: int = Field(..., description="borrow amount in wei")
     reserve_size: Union[int, str] = Field(..., description="pool reserve size in wei")
-    reserve_size = int(self.reserve_size)
 
+    @validator('reserve_size', pre=True, always=True)
+    def parse_reserve_size(cls, value):
+        if isinstance(value, str):
+            try:
+                value = int(value)
+            except ValueError:
+                raise ValueError(f"reserve_size must be an integer or a string representing an integer, but got {value}")
+        elif not isinstance(value, int):
+            raise ValueError(f"reserve_size must be an integer, but got {value}")
+        return value
 
 
     @model_validator(mode='before')
