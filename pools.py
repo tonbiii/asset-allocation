@@ -24,8 +24,7 @@ from typing import Dict, Literal, Union
 import bittensor as bt
 import numpy as np
 import web3.constants
-from pydantic import BaseModel, Field, PrivateAttr, model_validator, validator, constr, ValidationError
-
+from pydantic import BaseModel, Field, PrivateAttr, model_validator, validator
 from web3 import Web3 
 from web3.contract import Contract
 from web3.types import ChecksumAddress
@@ -40,9 +39,6 @@ from misc import (
     getReserveFactor,
     ttl_cache,
 )
-def to_checksum_address(address):
-    """Converts an address to a checksummed address."""
-    return Web3.toChecksumAddress(address)
 
 class POOL_TYPES(str, Enum):
     STURDY_SILO = "STURDY_SILO"
@@ -134,15 +130,23 @@ class ChainBasedPoolModel(BaseModel):
     pool_id: str = Field(..., description="uid of pool")
     pool_type: str = Field(..., description="type of pool")
     user_address: str = Field(
-        default=Web3.toChecksumAddress("0x0000000000000000000000000000000000000000"),
+        default=Web3.to_checksum_address("0x0000000000000000000000000000000000000000"),
         description="address of the 'user' - used for various on-chain calls",
     )
     contract_address: str = Field(
-        default=Web3.toChecksumAddress("0x0000000000000000000000000000000000000000"),
+        default=Web3.to_checksum_address("0x0000000000000000000000000000000000000000"),
         description="address of contract to call"
     )
 
     _initted: bool = PrivateAttr(False)
+    _user_address_checksum: ChecksumAddress = PrivateAttr(default=Web3.to_checksum_address("0x0000000000000000000000000000000000000000"))
+    _contract_address_checksum: ChecksumAddress = PrivateAttr(default=Web3.to_checksum_address("0x0000000000000000000000000000000000000000"))
+
+    @validator("user_address", "contract_address", pre=True, always=True)
+    def validate_checksum_address(cls, value):
+        if not Web3.isAddress(value):
+            raise ValueError(f"Address {value} is not valid!")
+        return Web3.to_checksum_address(value)
 
     @model_validator(mode='before')
     @classmethod
@@ -163,21 +167,6 @@ class ChainBasedPoolModel(BaseModel):
 
     def supply_rate(self, **args):
         raise NotImplementedError("supply_rate() has not been implemented!")
-    user_address: str = Field(
-        default=web3.constants.ADDRESS_ZERO,
-        description="address of the 'user' - used for various on-chain calls",
-    )
-    contract_address: str = Field(
-        default=web3.constants.ADDRESS_ZERO,
-        description="address of contract to call"
-    )
-
-    _user_address_checksum: ChecksumAddress = PrivateAttr(default=web3.constants.ADDRESS_ZERO)
-    _contract_address_checksum: ChecksumAddress = PrivateAttr(default=web3.constants.ADDRESS_ZERO)
-
-    @validator("user_address", "contract_address", pre=True, always=True)
-    def validate_checksum_address(cls, value):
-        return to_checksum_address(value)
 
 
 class PoolFactory:
